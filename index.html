@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saheem Ahamed — Battery Systems & Embedded Firmware Engineering</title>
+<meta name="description" content="Independent BESS diagnostics, embedded firmware, Modbus integration and PCB design. Riga, Latvia — serving the Baltics and EU.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0B1F33; --navy2:#10233A; --paper:#F6FAF8; --ink:#12263C;
+  --pulse:#34C97B; --pulse-dim:#1E7A4C; --fault:#FF6B5C; --amber:#FFB454;
+  --slate:#8AA0B4; --line:rgba(52,201,123,.25); --card:#0F2A44;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--navy);color:#DCE9E2;line-height:1.6;font-size:16px}
+h1,h2,h3{font-family:'Space Grotesk',sans-serif;line-height:1.15}
+.mono{font-family:'IBM Plex Mono',monospace}
+a{color:var(--pulse);text-decoration:none}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+section{padding:88px 0}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--pulse);margin-bottom:14px}
+.eyebrow::before{content:"// "}
+
+/* ---------- NAV ---------- */
+nav{position:sticky;top:0;z-index:50;background:rgba(11,31,51,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk';font-weight:700;font-size:17px;color:#fff}
+.logo svg{width:28px;height:28px}
+.nav-links{display:flex;gap:28px;font-size:14px}
+.nav-links a{color:#B9CBD9;transition:color .2s}
+.nav-links a:hover{color:var(--pulse)}
+.btn{display:inline-block;font-family:'Space Grotesk';font-weight:600;font-size:15px;padding:12px 24px;border-radius:6px;background:var(--pulse);color:var(--navy);transition:transform .15s,box-shadow .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(52,201,123,.35)}
+.btn.ghost{background:transparent;color:var(--pulse);border:1.5px solid var(--pulse)}
+.nav-cta{padding:9px 18px;font-size:14px}
+
+/* ---------- HERO ---------- */
+.hero{padding:96px 0 72px;position:relative;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.hero h1{font-size:clamp(34px,4.6vw,54px);font-weight:700;color:#fff;letter-spacing:-.02em}
+.hero h1 .g{color:var(--pulse)}
+.hero p.lead{margin:20px 0 30px;font-size:18px;color:#B9CBD9;max-width:52ch}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap}
+.hero-meta{margin-top:34px;display:flex;gap:26px;flex-wrap:wrap;font-family:'IBM Plex Mono';font-size:12.5px;color:var(--slate)}
+.hero-meta b{color:var(--pulse);font-weight:600}
+
+/* pulse line across hero */
+.pulseline{position:absolute;left:0;right:0;top:0;height:100%;pointer-events:none;opacity:.16}
+.pulseline svg{width:200%;height:100%}
+.trace{stroke:var(--pulse);stroke-width:2;fill:none;stroke-linecap:round;
+  stroke-dasharray:1600;stroke-dashoffset:1600;animation:draw 5s linear infinite}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+/* ---------- TERMINAL ---------- */
+.term{background:#07131F;border:1px solid var(--line);border-radius:10px;box-shadow:0 24px 60px rgba(0,0,0,.5);overflow:hidden}
+.term-bar{display:flex;align-items:center;gap:8px;padding:11px 14px;background:#0D2237;border-bottom:1px solid var(--line)}
+.dot{width:11px;height:11px;border-radius:50%}
+.dot.r{background:#FF5F57}.dot.y{background:#FEBC2E}.dot.g{background:#28C840}
+.term-title{margin-left:8px;font-family:'IBM Plex Mono';font-size:12px;color:var(--slate)}
+.term-body{padding:18px 18px 22px;font-family:'IBM Plex Mono';font-size:13px;line-height:1.75;min-height:308px;color:#9FD8BC;white-space:pre-wrap}
+.term-body .ok{color:var(--pulse)}
+.term-body .fault{color:var(--fault);font-weight:600}
+.term-body .dim{color:#5E7A8F}
+.cursor{display:inline-block;width:8px;height:15px;background:var(--pulse);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ---------- SERVICES ---------- */
+.light{background:var(--paper);color:var(--ink)}
+.light .eyebrow{color:var(--pulse-dim)}
+.sec-head{max-width:640px;margin-bottom:48px}
+.sec-head h2{font-size:clamp(28px,3.4vw,40px);color:inherit}
+.light .sec-head p{color:#4B6377;margin-top:12px;font-size:17px}
+.svc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.svc{background:#fff;border:1px solid #E2EDE7;border-radius:12px;padding:30px 28px;transition:transform .18s,box-shadow .22s;position:relative;overflow:hidden}
+.svc:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(16,38,60,.12)}
+.svc::after{content:"";position:absolute;left:0;top:0;width:4px;height:100%;background:var(--pulse);transform:scaleY(0);transform-origin:top;transition:transform .25s}
+.svc:hover::after{transform:scaleY(1)}
+.svc .ico{width:46px;height:46px;margin-bottom:18px}
+.svc h3{font-size:20px;color:var(--ink);margin-bottom:10px}
+.svc p{font-size:15px;color:#4B6377}
+.svc ul{margin-top:14px;list-style:none}
+.svc li{font-family:'IBM Plex Mono';font-size:12.5px;color:var(--pulse-dim);padding:3px 0}
+.svc li::before{content:"› ";color:var(--pulse)}
+
+/* ---------- PROOF ---------- */
+.proof .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:28px}
+.pcard .mono{font-size:12px;color:var(--slate);letter-spacing:.08em}
+.pcard h3{font-size:19px;color:#fff;margin:10px 0 8px}
+.pcard p{font-size:14.5px;color:#B9CBD9}
+.badge{display:inline-block;font-family:'IBM Plex Mono';font-size:11.5px;color:var(--navy);background:var(--pulse);border-radius:4px;padding:3px 9px;font-weight:600;margin-bottom:14px}
+.wave{height:44px;margin-top:18px}
+.wave svg{width:100%;height:100%}
+.wave path{stroke:var(--pulse);stroke-width:1.6;fill:none;opacity:.7}
+
+/* ---------- PROCESS ---------- */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;counter-reset:step}
+.step{border-top:2px solid var(--line);padding-top:20px}
+.step .n{font-family:'IBM Plex Mono';font-size:12px;color:var(--pulse)}
+.step h3{font-size:17px;color:#fff;margin:8px 0 6px}
+.step p{font-size:14px;color:#9FB4C6}
+
+/* ---------- ABOUT ---------- */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.about-grid .chipart{width:100%;max-width:420px;margin:0 auto;display:block}
+.about h2{color:var(--ink)}
+.about p{color:#4B6377;margin-top:14px;font-size:16.5px}
+.creds{margin-top:22px;display:flex;flex-direction:column;gap:10px}
+.cred{display:flex;gap:12px;align-items:flex-start;font-size:15px;color:var(--ink)}
+.cred svg{flex:none;width:20px;height:20px;margin-top:2px}
+
+/* ---------- CTA ---------- */
+.cta{text-align:center;background:linear-gradient(180deg,var(--navy) 0%,#0D2A46 100%)}
+.cta h2{font-size:clamp(28px,3.6vw,42px);color:#fff;max-width:20ch;margin:0 auto}
+.cta p{color:#B9CBD9;margin:18px auto 30px;max-width:52ch}
+.cta .mono-note{margin-top:26px;font-family:'IBM Plex Mono';font-size:13px;color:var(--slate)}
+
+footer{border-top:1px solid var(--line);padding:34px 0;font-size:13.5px;color:var(--slate)}
+.foot-in{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.foot-links{display:flex;gap:22px}
+
+@media(max-width:900px){
+  .hero-grid,.about-grid{grid-template-columns:1fr}
+  .svc-grid{grid-template-columns:1fr}
+  .proof .card-grid{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr 1fr}
+  .nav-links{display:none}
+  section{padding:64px 0}
+}
+@media(prefers-reduced-motion:reduce){
+  .trace{animation:none;stroke-dashoffset:0}
+  .cursor{animation:none}
+  *{transition:none!important}
+}
+:focus-visible{outline:2px solid var(--pulse);outline-offset:3px;border-radius:4px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="logo" href="#top" aria-label="Home">
+      <svg viewBox="0 0 32 32" fill="none"><rect x="4" y="7" width="22" height="18" rx="4" stroke="#34C97B" stroke-width="2.2"/><rect x="27" y="12" width="3" height="8" rx="1.5" fill="#34C97B"/><path d="M8 16h4l2-5 3 10 2-5h5" stroke="#34C97B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      Saheem Ahamed
+    </a>
+    <div class="nav-links">
+      <a href="#services">Services</a>
+      <a href="#work">Work</a>
+      <a href="#process">Process</a>
+      <a href="#about">About</a>
+    </div>
+    <a class="btn nav-cta" href="#contact">Start a project</a>
+  </div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header class="hero" id="top">
+  <div class="pulseline" aria-hidden="true">
+    <svg viewBox="0 0 1600 400" preserveAspectRatio="none">
+      <path class="trace" d="M0,200 L180,200 L210,120 L245,290 L280,200 L520,200 L550,140 L585,270 L620,200 L900,200 L930,90 L970,310 L1010,200 L1280,200 L1310,150 L1345,260 L1380,200 L1600,200"/>
+    </svg>
+  </div>
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Battery systems &amp; embedded engineering</div>
+      <h1>Firmware that reads the metal.<br>Diagnostics that read the <span class="g">battery.</span></h1>
+      <p class="lead">Independent engineering for energy systems — BESS health verification, bare-metal firmware, Modbus integration and PCB design. Based in Riga, working across the Baltics and the EU.</p>
+      <div class="hero-ctas">
+        <a class="btn" href="#contact">Book a discovery call</a>
+        <a class="btn ghost" href="#services">See services</a>
+      </div>
+      <div class="hero-meta">
+        <span><b>1st place</b> — STMicroelectronics pan-EU competition</span>
+        <span><b>IEC 62619</b> battery test experience</span>
+        <span><b>EU</b> work authorized</span>
+      </div>
+    </div>
+    <div class="term" aria-label="Live demo: battery monitor firmware output">
+      <div class="term-bar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <span class="term-title">bms-monitor — /dev/tty.usbmodem103 — 9600 baud</span>
+      </div>
+      <div class="term-body" id="termOut"></div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= SERVICES ================= -->
+<section class="light" id="services">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Services</div>
+      <h2>Four ways I make energy hardware work harder.</h2>
+      <p>From the register level to the plant level — one engineer covering the layers most teams have to hire twice for.</p>
+    </div>
+    <div class="svc-grid">
+      <div class="svc">
+        <svg class="ico" viewBox="0 0 48 48" fill="none"><rect x="6" y="12" width="30" height="24" rx="5" stroke="#1E7A4C" stroke-width="2.4"/><rect x="38" y="19" width="5" height="10" rx="2" fill="#34C97B"/><path d="M12 24h5l3-7 4 14 3-7h7" stroke="#34C97B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h3>BESS diagnostics &amp; SOH verification</h3>
+        <p>Independent battery health checks for asset owners. Know your real State of Health — not the vendor's version of it — with defensible data for warranty claims and revenue planning.</p>
+        <ul>
+          <li>SOH &amp; capacity verification</li>
+          <li>DCIR / internal resistance testing</li>
+          <li>Warranty evidence packs</li>
+          <li>Commissioning checks</li>
+        </ul>
+      </div>
+      <div class="svc">
+        <svg class="ico" viewBox="0 0 48 48" fill="none"><rect x="12" y="12" width="24" height="24" rx="4" stroke="#1E7A4C" stroke-width="2.4"/><rect x="19" y="19" width="10" height="10" rx="2" fill="#34C97B"/><path d="M18 12V5M24 12V5M30 12V5M18 43v-7M24 43v-7M30 43v-7M12 18H5M12 24H5M12 30H5M43 18h-7M43 24h-7M43 30h-7" stroke="#1E7A4C" stroke-width="2.2" stroke-linecap="round"/></svg>
+        <h3>Embedded firmware development</h3>
+        <p>Bare-metal and HAL firmware for STM32 and similar MCUs. Register-level control when it matters, production structure always — drivers, state machines, UART/ADC/I2C/SPI.</p>
+        <ul>
+          <li>STM32 bare-metal &amp; HAL</li>
+          <li>Sensor drivers &amp; data acquisition</li>
+          <li>Monitoring &amp; fault-detection logic</li>
+          <li>Serial protocols (UART, RS-485)</li>
+        </ul>
+      </div>
+      <div class="svc">
+        <svg class="ico" viewBox="0 0 48 48" fill="none"><circle cx="10" cy="24" r="4" stroke="#1E7A4C" stroke-width="2.4"/><circle cx="38" cy="12" r="4" stroke="#1E7A4C" stroke-width="2.4"/><circle cx="38" cy="36" r="4" stroke="#1E7A4C" stroke-width="2.4"/><path d="M14 24h8m0 0 12-10m-12 10 12 10" stroke="#34C97B" stroke-width="2.4" stroke-linecap="round"/></svg>
+        <h3>Modbus &amp; systems integration</h3>
+        <p>Make inverters, meters, BMS units and building systems talk. Modbus RTU/TCP integration, data logging, dashboards and energy-management logic — built and commissioned.</p>
+        <ul>
+          <li>Modbus RTU / TCP integration</li>
+          <li>EMS &amp; price-optimization logic</li>
+          <li>Home Assistant / ESPHome automation</li>
+          <li>Monitoring dashboards</li>
+        </ul>
+      </div>
+      <div class="svc">
+        <svg class="ico" viewBox="0 0 48 48" fill="none"><rect x="7" y="7" width="34" height="34" rx="4" stroke="#1E7A4C" stroke-width="2.4"/><path d="M7 17h12l4 5h18M7 31h10l5-5m8 12V27l6-5" stroke="#34C97B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19" cy="17" r="2.4" fill="#34C97B"/><circle cx="30" cy="38" r="2.4" fill="#34C97B"/></svg>
+        <h3>PCB design &amp; electronics</h3>
+        <p>Schematic capture and PCB layout in KiCad for monitoring nodes, sensor boards and power circuits — with protection features designed in, not bolted on.</p>
+        <ul>
+          <li>Schematic design (KiCad)</li>
+          <li>2-layer PCB layout</li>
+          <li>Power &amp; protection circuits</li>
+          <li>Prototype bring-up &amp; test</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROOF / WORK ================= -->
+<section class="proof" id="work">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Selected work</div>
+      <h2 style="color:#fff">Built, measured, shipped.</h2>
+    </div>
+    <div class="card-grid">
+      <div class="pcard">
+        <span class="badge">FIRMWARE</span>
+        <h3>4-cell BMS monitor on bare-metal STM32</h3>
+        <p>Register-level firmware streaming per-cell voltages over UART with live threshold fault detection — the firmware core of a battery monitoring node. No HAL, no libraries.</p>
+        <div class="wave" aria-hidden="true"><svg viewBox="0 0 300 44" preserveAspectRatio="none"><path d="M0,22 L40,22 L48,8 L58,36 L66,22 L120,22 L128,12 L138,32 L146,22 L210,22 L218,4 L230,40 L240,22 L300,22"/></svg></div>
+      </div>
+      <div class="pcard">
+        <span class="badge">DATA / ML</span>
+        <h3>Battery Health Analyzer — NASA dataset</h3>
+        <p>SOH, capacity fade and remaining-useful-life analysis on the NASA battery aging dataset, with pass/fail diagnostic verdicts. Python, published on GitHub.</p>
+        <div class="wave" aria-hidden="true"><svg viewBox="0 0 300 44" preserveAspectRatio="none"><path d="M0,10 C60,12 90,16 130,22 C180,30 230,36 300,40"/></svg></div>
+      </div>
+      <div class="pcard">
+        <span class="badge">INTEGRATION</span>
+        <h3>EMS prototype — Modbus + Nord Pool</h3>
+        <p>Energy-management prototype: Modbus TCP device polling, spot-price optimization against Nord Pool, and a live dashboard — built for a BESS consulting engagement.</p>
+        <div class="wave" aria-hidden="true"><svg viewBox="0 0 300 44" preserveAspectRatio="none"><path d="M0,34 L30,34 L30,16 L70,16 L70,28 L110,28 L110,8 L150,8 L150,24 L190,24 L190,12 L230,12 L230,30 L270,30 L270,18 L300,18"/></svg></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROCESS ================= -->
+<section id="process" style="background:#0D2A46">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">How engagements run</div>
+      <h2 style="color:#fff">A measured process — literally.</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="n mono">STEP 01</div><h3>Discovery</h3><p>A short call to define the problem, the system, and what "working" means in numbers.</p></div>
+      <div class="step"><div class="n mono">STEP 02</div><h3>Scoped proposal</h3><p>Fixed scope, fixed price, clear deliverables. No open-ended hourly mystery.</p></div>
+      <div class="step"><div class="n mono">STEP 03</div><h3>Build &amp; measure</h3><p>Weekly progress you can see — data, code, test results. Not status theatre.</p></div>
+      <div class="step"><div class="n mono">STEP 04</div><h3>Handover</h3><p>Documentation, source, and a walkthrough. You own everything, and it's explained.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section class="light about" id="about">
+  <div class="wrap about-grid">
+    <div>
+      <div class="eyebrow">About</div>
+      <h2>An engineer who works at both ends of the wire.</h2>
+      <p>I'm Saheem Ahamed, an electrical engineer in Riga (BSc, Riga Technical University — Adaptronics). I've tested lithium-ion cells to IEC 62619 in the lab, automated battery measurement with Python and SCPI instrumentation, commissioned building automation on Modbus RS-485, and written bare-metal STM32 firmware from the reference manual up.</p>
+      <p>That mix — battery testing, industrial protocols, and firmware — is the gap most energy projects fall into. I work in that gap.</p>
+      <div class="creds">
+        <div class="cred"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#1E7A4C" stroke-width="1.6"/><path d="M6 10.5l2.5 2.5L14 7.5" stroke="#34C97B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>1st place</b>, STMicroelectronics pan-European "Small Components, Big Ideas" competition</span></div>
+        <div class="cred"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#1E7A4C" stroke-width="1.6"/><path d="M6 10.5l2.5 2.5L14 7.5" stroke="#34C97B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Battery &amp; BMS testing to <b>IEC 62619</b> — DCIR, capacity, SOH</span></div>
+        <div class="cred"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#1E7A4C" stroke-width="1.6"/><path d="M6 10.5l2.5 2.5L14 7.5" stroke="#34C97B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Building automation &amp; <b>Modbus RS-485</b> commissioning experience</span></div>
+        <div class="cred"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#1E7A4C" stroke-width="1.6"/><path d="M6 10.5l2.5 2.5L14 7.5" stroke="#34C97B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>EU work authorized — no sponsorship needed. English fluent, Latvian conversational &amp; improving</span></div>
+      </div>
+    </div>
+    <svg class="chipart" viewBox="0 0 420 420" fill="none" aria-hidden="true">
+      <rect x="30" y="30" width="360" height="360" rx="18" fill="#0D2A46"/>
+      <g stroke="#1E7A4C" stroke-width="2" opacity=".85">
+        <path d="M30 120 h80 l24 24 h60"/><path d="M30 180 h60 l30 -30 h70"/>
+        <path d="M30 260 h100 l20 20 h44"/><path d="M390 120 h-80 l-24 24 h-50"/>
+        <path d="M390 200 h-60 l-30 30 h-64"/><path d="M390 300 h-90 l-24 -24 h-40"/>
+        <path d="M140 390 v-60 l24 -24 v-40"/><path d="M220 390 v-80 l-20 -20"/>
+        <path d="M300 30 v70 l-24 24"/><path d="M120 30 v50 l30 30"/>
+      </g>
+      <g fill="#34C97B">
+        <circle cx="194" cy="144" r="4"/><circle cx="190" cy="150" r="0"/><circle cx="160" cy="180" r="4"/>
+        <circle cx="194" cy="280" r="4"/><circle cx="236" cy="230" r="4"/><circle cx="276" cy="124" r="4"/>
+        <circle cx="150" cy="110" r="4"/><circle cx="164" cy="306" r="4"/><circle cx="200" cy="290" r="0"/>
+      </g>
+      <rect x="150" y="150" width="120" height="120" rx="10" fill="#0B1F33" stroke="#34C97B" stroke-width="2.4"/>
+      <path d="M172 210 h18 l8 -20 12 40 8 -20 h30" stroke="#34C97B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="210" y="252" text-anchor="middle" font-family="IBM Plex Mono" font-size="13" fill="#8AA0B4">STM32</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ================= CTA ================= -->
+<section class="cta" id="contact">
+  <div class="wrap">
+    <div class="eyebrow" style="text-align:center">Start a project</div>
+    <h2>Tell me what your system should be doing — and isn't.</h2>
+    <p>A 20-minute discovery call is free, and you'll leave with a clearer picture of the problem even if we never work together.</p>
+    <a class="btn" href="mailto:hello@nextgenbatteries.lv?subject=Project%20inquiry">Email me — hello@nextgenbatteries.lv</a>
+    <div class="mono-note">or connect on <a href="https://www.linkedin.com/in/saheem-ahamed-77a66b1b0">LinkedIn</a> · code on <a href="https://github.com/Saheem424">GitHub</a></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-in">
+    <span>© 2026 Saheem Ahamed · NextGen Batteries · Riga, Latvia</span>
+    <div class="foot-links">
+      <a href="#services">Services</a>
+      <a href="#work">Work</a>
+      <a href="https://saheem424.github.io/nextgenbatteries">NextGen Batteries</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* Live-typing BMS terminal — replays Saheem's real monitor output */
+(function(){
+  var out = document.getElementById('termOut');
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var lines = [
+    {t:'$ screen /dev/tty.usbmodem103 9600', c:'dim'},
+    {t:'', c:''},
+    {t:'NextGen BMS Monitor — 4S Li-ion', c:'ok'},
+    {t:'--- Cycle 12 ---', c:'dim'},
+    {t:'  Cell 1: 3.68V  [OK]', c:''},
+    {t:'  Cell 2: 3.71V  [OK]', c:''},
+    {t:'  Cell 3: 3.66V  [OK]', c:''},
+    {t:'  Cell 4: 3.70V  [OK]', c:''},
+    {t:'  Pack avg: 3.69V   Status: HEALTHY', c:'ok'},
+    {t:'--- Cycle 13 ---', c:'dim'},
+    {t:'  Cell 1: 3.67V  [OK]', c:''},
+    {t:'  Cell 2: 3.70V  [OK]', c:''},
+    {t:'  Cell 3: 3.65V  [OK]', c:''},
+    {t:'  Cell 4: 4.27V  [FAULT]', c:'fault'},
+    {t:'  Pack avg: 3.82V   Status: !! FAULT DETECTED !!', c:'fault'},
+    {t:'', c:''},
+    {t:'> fault isolated: cell 4 over-voltage — caught before it cost anything.', c:'ok'}
+  ];
+  if (reduced){
+    out.innerHTML = lines.map(function(l){
+      return '<span class="'+l.c+'">'+l.t+'</span>';
+    }).join('\n');
+    return;
+  }
+  var li=0, ch=0, buf='';
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+  function render(partial, cls){
+    out.innerHTML = buf + (partial!==undefined ? '<span class="'+cls+'">'+esc(partial)+'</span>' : '') + '<span class="cursor"></span>';
+  }
+  function tick(){
+    if (li >= lines.length){
+      setTimeout(function(){ buf=''; li=0; ch=0; tick(); }, 6000);
+      return;
+    }
+    var line = lines[li];
+    if (ch <= line.t.length){
+      render(line.t.slice(0,ch), line.c);
+      ch += 2;
+      setTimeout(tick, line.t ? 18 : 60);
+    } else {
+      buf += '<span class="'+line.c+'">'+esc(line.t)+'</span>\n';
+      li++; ch=0;
+      setTimeout(tick, line.t.indexOf('Cycle')>-1 ? 340 : 120);
+    }
+  }
+  tick();
+})();
+</script>
+</body>
+</html>
